@@ -50,6 +50,20 @@ def extract_msys(params):
         return sys + '2'
     return sys
 
+def extract_pids(row):
+    pids = "0,17,18"
+    vid  = row[5].split("=")[0]
+    if vid != '0' and vid != '1':
+        pids = pids + "," + vid.replace("+", ",")
+    apids = row[6].split(';')
+    for apid in apids:
+        aapid = apid.split("=")[0]
+        pids = pids + "," + aapid
+    pmt = row[13]
+    pids = pids + "," + pmt
+    return pids
+
+
 with open('channels.conf', 'rb') as f:
     reader = csv.reader(f, delimiter=':', quoting=csv.QUOTE_NONE)
     for row in reader:
@@ -63,7 +77,7 @@ with open('channels.conf', 'rb') as f:
         msys = extract_msys(params)
         mtype = extract_mtype(params)
         sr = row[4]
-        pmt = row[13]
-        url = "rtsp://" + ip_address + "?fe=" + fe + "&freq=" + freq + "&pol=" + pol + "&ro=" + ro + '&msys=' + msys + '&mytpe=' + mtype + '&sr=' + sr + '&fec=' + fec
+        pids = extract_pids(row)
+        url = "rtsp://" + ip_address + "/?fe=" + fe + "&freq=" + freq + "&pol=" + pol + "&ro=" + ro + '&msys=' + msys + '&mytpe=' + mtype + '&sr=' + sr + '&fec=' + fec
         print "#EXTINF:0,116. " + service
-        print url + '&pids=0,17,18,' + pmt
+        print url + '&pids=' + pids
